@@ -21,6 +21,12 @@ class Person(db.Model):
   date = db.DateTimeProperty(auto_now_add=True)
   hashedkey = db.StringProperty()
 
+  def openidURI(self):
+    from openid.yadis import xri
+    if xri.identifierScheme(self.openid) == "XRI":
+      return "http://xri.net/%s" % self.openid
+    return self.openid
+
   def pretty_openid(self):
     return self.openid.replace('http://','').replace('https://','').rstrip('/').split('#')[0]
 
