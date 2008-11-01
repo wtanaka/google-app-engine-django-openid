@@ -1,3 +1,4 @@
+# vim:ts=2:sw=2:expandtab
 import hashlib
 
 from google.appengine.ext import db
@@ -49,6 +50,19 @@ class Session(db.Expando):
 
   # this goes in the cookie
   session_id = db.StringProperty()
+
+  def __init__(self, parent=None, key_name=None, **kw):
+    """if key_name is None, generate a random key_name so that
+       session_id cookies are not guessable
+    """
+    if key_name is None:
+      import uuid
+      key_name = uuid.uuid4()
+      import binascii
+      key_name = binascii.unhexlify(key_name.hex)
+      import base64
+      key_name = "S" + base64.urlsafe_b64encode(key_name).rstrip('=')
+    super(db.Expando, self).__init__(parent=parent, key_name=key_name, **kw)
 
   def put(self):
     if self.session_id is None:
