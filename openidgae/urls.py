@@ -7,5 +7,5 @@ urlpatterns = patterns('',
   (r'^openid-logout/$', 'openidgae.views.LogoutSubmit'),
   (r'^openid-start/$', 'openidgae.views.OpenIDStartSubmit'),
   (r'^openid-finish/$', 'openidgae.views.OpenIDFinish'),
-  (r'^rpxrds/$', 'openidgae.views.RelyingPartyXRDS'),
+  (r'^openid-rpxrds/$', 'openidgae.views.RelyingPartyXRDS'),
 )

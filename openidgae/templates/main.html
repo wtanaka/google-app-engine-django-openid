@@ -5,7 +5,7 @@
 {% block content %}
 
 {% if not lip %}
- <a href="/openid-login/" style="text-decoration:underline;" class="good">Login to get started &rarr;</a>
+ <a href="{% url openidgae.views.LoginPage %}" style="text-decoration:underline;" class="good">Login to get started &rarr;</a>
 {% endif %}
 
 {% endblock %}

@@ -11,8 +11,8 @@ import pprint
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext import db
-from google.appengine.ext.webapp import template
 
+import django.core.urlresolvers
 import django.http
 
 from openid import fetchers
@@ -40,8 +40,13 @@ def render(template_name, request, response, extra_values={}):
     values['bookmarklet'] = None
 
   values.update(extra_values)
-  path = os.path.join(DIRNAME, 'templates', template_name)
-  return template.render(path, values)
+  #path = os.path.join(DIRNAME, 'templates', template_name)
+  #return template.render(path, values)
+
+  import django.template
+  import django.template.loader
+  t = django.template.loader.get_template(template_name)
+  return t.render(django.template.Context(values))
 
 def get_full_path(request):
   full_path = ('http', ('', 's')[request.is_secure()], '://',
@@ -190,7 +195,8 @@ def OpenIDStartSubmit(request):
 
     import urlparse
     parts = list(urlparse.urlparse(get_full_path(request)))
-    parts[2] = 'openid-finish/'
+    # finish URL with the leading "/" character removed
+    parts[2] = django.core.urlresolvers.reverse('openidgae.views.OpenIDFinish')[1:]
     parts[4] = ''
     parts[5] = ''
     return_to = urlparse.urlunparse(parts)
@@ -217,8 +223,7 @@ def OpenIDFinish(request):
   response = django.http.HttpResponse()
   if request.method == 'GET':
     args = args_to_dict(request.GET)
-    url = 'http://'+request.META['HTTP_HOST']+'/openid-finish/'
-
+    url = 'http://'+request.META['HTTP_HOST']+django.core.urlresolvers.reverse('openidgae.views.OpenIDFinish')
     session = get_session(request, response)
     s = {}
     if session.openid_stuff:
@@ -257,7 +262,7 @@ def OpenIDFinish(request):
 
       s.put()
 
-      return django.http.HttpResponseRedirect('/openid-home/')
+      return django.http.HttpResponseRedirect(django.core.urlresolvers.reverse('openidgae.views.HomePage'))
 
     else:
       return show_main_page(request, 'OpenID verification failed :(')
@@ -286,11 +291,12 @@ def RelyingPartyXRDS(request):
   <XRD>
     <Service>
       <Type>http://specs.openid.net/auth/2.0/return_to</Type>
-      <URI>http://%s/openid-finish/</URI>
+      <URI>http://%s%s</URI>
     </Service>
 </XRD>
 </xrds:XRDS>      
-""" % (request.META['HTTP_HOST'],)
+""" % (request.META['HTTP_HOST'],django.core.urlresolvers.reverse('openidgae.views.OpenIDFinish'),)
+    
 
     response['Content-Type'] = 'application/xrds+xml'
     response.write(xrds)

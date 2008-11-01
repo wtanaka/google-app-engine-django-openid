@@ -5,7 +5,7 @@
 {% block content %}
 <h2>Login</h2>
 
-<form action="/openid-start/" method="post">
+<form action="{% url openidgae.views.OpenIDStartSubmit %}" method="post">
 
 <input type="text" name="openid_identifier" id="openid_identifier" />
 <input type="submit" value="Verify" />
