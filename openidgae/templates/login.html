@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Please verify your OpenID{% endblock %}
+
+{% block content %}
+<h2>Login</h2>
+
+<form action="/openid-start" method="post">
+
+<input type="text" name="openid_identifier" id="openid_identifier" />
+<input type="submit" value="Verify" />
+
+</form>
+
+<!-- BEGIN ID SELECTOR --> 
+<script type="text/javascript" id="__openidselector" src="https://www.idselector.com/selector/46b0e6d0c8ba5c8617f6f5b970865604c9f87da5" charset="utf-8"></script>
+<!-- END ID SELECTOR -->
+{% endblock %}

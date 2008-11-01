@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block title %}OpenID Consumer Example{% endblock %}
+
+{% block content %}
+
+{% if not lip %}
+ <a href="/openid-login" style="text-decoration:underline;" class="good">Login to get started &rarr;</a>
+{% endif %}
+
+{% endblock %}
