@@ -1,7 +1,7 @@
 # vim:ts=2:sw=2:expandtab
 import cgi
 import wsgiref.handlers
-import urlparse, urllib
+import urllib
 import os
 import logging
 import datetime
@@ -129,7 +129,7 @@ def MainPage(request, error_msg):
       'error_msg': error_msg,
       }
 
-    response['X-XRDS-Location'] = 'http://'+request.META['HTTP_HOST']+'/rpxrds'
+    response['X-XRDS-Location'] = 'http://'+request.META['HTTP_HOST']+'/rpxrds/'
     response.write(render('main.html', request, response, template_values))
     return response
 
@@ -188,8 +188,9 @@ def OpenIDStartSubmit(request):
       logging.error(str(e))
       return show_main_page(request, 'An error occured determining your server information.  Please try again.')
 
+    import urlparse
     parts = list(urlparse.urlparse(get_full_path(request)))
-    parts[2] = 'openid-finish'
+    parts[2] = 'openid-finish/'
     parts[4] = ''
     parts[5] = ''
     return_to = urlparse.urlunparse(parts)
@@ -216,7 +217,7 @@ def OpenIDFinish(request):
   response = django.http.HttpResponse()
   if request.method == 'GET':
     args = args_to_dict(request.GET)
-    url = 'http://'+request.META['HTTP_HOST']+'/openid-finish'
+    url = 'http://'+request.META['HTTP_HOST']+'/openid-finish/'
 
     session = get_session(request, response)
     s = {}
@@ -256,7 +257,7 @@ def OpenIDFinish(request):
 
       s.put()
 
-      return django.http.HttpResponseRedirect('/home')
+      return django.http.HttpResponseRedirect('/openid-home/')
 
     else:
       return show_main_page(request, 'OpenID verification failed :(')
@@ -285,7 +286,7 @@ def RelyingPartyXRDS(request):
   <XRD>
     <Service>
       <Type>http://specs.openid.net/auth/2.0/return_to</Type>
-      <URI>http://%s/openid-finish</URI>
+      <URI>http://%s/openid-finish/</URI>
     </Service>
 </XRD>
 </xrds:XRDS>      
