@@ -34,11 +34,6 @@ def render(template_name, request, response, extra_values={}):
     'lip': get_logged_in_person(request, response)
     }
 
-  if values['lip']:
-    values['bookmarklet'] = bookmarklet(request.META['HTTP_HOST'], values['lip'])
-  else:
-    values['bookmarklet'] = None
-
   values.update(extra_values)
   #path = os.path.join(DIRNAME, 'templates', template_name)
   #return template.render(path, values)
@@ -52,14 +47,6 @@ def get_full_path(request):
   full_path = ('http', ('', 's')[request.is_secure()], '://',
       request.META['HTTP_HOST'], request.path)
   return ''.join(full_path)
-
-############# Utils #####################
-def bookmarklet(host, person):
-  js = """
-javascript:
-var d=document,w=window,f='http://%s/add',l=d.location,e=encodeURIComponent,p='?bookmarklet=true&v=1&k=%s&url='+e(l.href),u=f+p;var a=function(){if(!w.open(u,'t','toolbar=0,resizable=0,status=1,width=250,height=150'))l.href=u;};if(/Firefox/.test(navigator.userAgent))setTimeout(a,0);else a();void(0)
-""" % (host,person.hashedkey)
-  return js.replace("\n",'')
 
 def get_store():
   return store.DatastoreStore()
