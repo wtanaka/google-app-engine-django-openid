@@ -3,12 +3,17 @@ import os
 import logging
 import datetime
 
+from django.conf import settings
 import django.core.urlresolvers
 import django.http
 
 from openid.consumer.consumer import Consumer
 from openid.consumer import discover
 import store
+
+COOKIE_NAME='openidgae_sess'
+if hasattr(settings, 'OPENIDGAE_COOKIE_NAME'):
+  COOKIE_NAME = settings.OPENIDGAE_COOKIE_NAME
 
 def installFetcher():
   from openid import fetchers
@@ -45,15 +50,15 @@ def has_session(self):
   return bool(self.session)
 
 def get_session_id_from_cookie(request):
-  if request.COOKIES.has_key('session_id'):
-    return request.COOKIES['session_id']
+  if request.COOKIES.has_key(COOKIE_NAME):
+    return request.COOKIES[COOKIE_NAME]
 
   return None
 
 def write_session_id_cookie(response, session_id):
   expires = datetime.datetime.now() + datetime.timedelta(weeks=2)
   expires_rfc822 = expires.strftime('%a, %d %b %Y %H:%M:%S +0000')
-  response.set_cookie('session_id', session_id, expires=expires_rfc822)
+  response.set_cookie(COOKIE_NAME, session_id, expires=expires_rfc822)
 
 def get_session(request, response, create=True):
   if hasattr(request, 'openidgae_session'):
