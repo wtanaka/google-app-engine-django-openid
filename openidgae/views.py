@@ -3,17 +3,13 @@ import os
 import logging
 import datetime
 
-from django.conf import settings
 import django.core.urlresolvers
 import django.http
 
 from openid.consumer.consumer import Consumer
 from openid.consumer import discover
 import store
-
-COOKIE_NAME='openidgae_sess'
-if hasattr(settings, 'OPENIDGAE_COOKIE_NAME'):
-  COOKIE_NAME = settings.OPENIDGAE_COOKIE_NAME
+import openidgae
 
 def installFetcher():
   from openid import fetchers
@@ -23,7 +19,7 @@ def installFetcher():
 DIRNAME = os.path.dirname(__file__)
 def render(template_name, request, response, extra_values={}):
   values = {
-    'lip': get_logged_in_person(request, response)
+    'lip': openidgae.get_logged_in_person(request, response)
     }
 
   values.update(extra_values)
@@ -45,54 +41,6 @@ def get_store():
 
 def args_to_dict(querydict):
   return dict([(arg, values[0]) for arg, values in querydict.lists()])
-
-def has_session(self):
-  return bool(self.session)
-
-def get_session_id_from_cookie(request):
-  if request.COOKIES.has_key(COOKIE_NAME):
-    return request.COOKIES[COOKIE_NAME]
-
-  return None
-
-def write_session_id_cookie(response, session_id):
-  expires = datetime.datetime.now() + datetime.timedelta(weeks=2)
-  expires_rfc822 = expires.strftime('%a, %d %b %Y %H:%M:%S +0000')
-  response.set_cookie(COOKIE_NAME, session_id, expires=expires_rfc822)
-
-def get_session(request, response, create=True):
-  if hasattr(request, 'openidgae_session'):
-    return request.openidgae_session
-
-  # get existing session
-  session_id = get_session_id_from_cookie(request)
-  if session_id:
-    import models
-    session = models.Session.get_by_key_name(session_id)
-    if session is not None:
-      request.openidgae_session = session
-      return request.openidgae_session
-
-  if create:
-    import models
-    request.openidgae_session = models.Session()
-    request.openidgae_session.put()
-    write_session_id_cookie(response, request.openidgae_session.key().name())
-    return request.openidgae_session
-
-  return None
-
-def get_logged_in_person(request, response):
-  if hasattr(request, 'openidgae_logged_in_person'):
-    return request.openidgae_logged_in_person
-
-  s = get_session(request, response, create=False)
-  if s and s.person:
-    request.openidgae_logged_in_person = s.person
-    return request.openidgae_logged_in_person
-
-  return None
-
 
 def show_main_page(request, error_msg=None):
   """Do an internal (non-302) redirect to the front page.
@@ -131,7 +79,7 @@ def PersonPage(request):
       return show_main_page(request, 'Unknown user')
 
 
-    lip = get_logged_in_person(request, response)
+    lip = openidgae.get_logged_in_person(request, response)
 
     response.write(render('person.html',request,response,
           {'person':p,
@@ -142,7 +90,7 @@ def HomePage(request):
   installFetcher()
   response = django.http.HttpResponse()
   if request.method == 'GET':
-    if get_logged_in_person(request, response):
+    if openidgae.get_logged_in_person(request, response):
       response.write(render('home.html',request,response,{}))
       return response
     else:
@@ -182,7 +130,7 @@ def OpenIDStartSubmit(request):
     realm = urlparse.urlunparse(parts[0:2] + [''] * 4)
 
     # save the session stuff
-    session = get_session(request, response)
+    session = openidgae.get_session(request, response)
     import pickle
     session.openid_stuff = pickle.dumps(c.session)
     session.put()
@@ -202,7 +150,7 @@ def OpenIDFinish(request):
   if request.method == 'GET':
     args = args_to_dict(request.GET)
     url = 'http://'+request.META['HTTP_HOST']+django.core.urlresolvers.reverse('openidgae.views.OpenIDFinish')
-    session = get_session(request, response)
+    session = openidgae.get_session(request, response)
     s = {}
     if session.openid_stuff:
       try:
@@ -227,7 +175,7 @@ def OpenIDFinish(request):
       else:
         p = persons[0]
 
-      s = get_session(request, response)
+      s = openidgae.get_session(request, response)
       s.person = p.key()
       request.openidgae_logged_in_person = p
 
@@ -249,7 +197,7 @@ def LogoutSubmit(request):
   installFetcher()
   response = django.http.HttpResponse()
   if request.method == 'GET':
-    s = get_session(request, response)
+    s = openidgae.get_session(request, response)
     if s:
       s.person = None
       s.put()
