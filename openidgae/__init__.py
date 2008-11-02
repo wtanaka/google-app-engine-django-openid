@@ -1,3 +1,4 @@
+# vim:ts=2:sw=2:expandtab
 from django.conf import settings
 
 COOKIE_NAME='openidgae_sess'
@@ -11,6 +12,7 @@ def get_session_id_from_cookie(request):
   return None
 
 def write_session_id_cookie(response, session_id):
+  import datetime
   expires = datetime.datetime.now() + datetime.timedelta(weeks=2)
   expires_rfc822 = expires.strftime('%a, %d %b %Y %H:%M:%S +0000')
   response.set_cookie(COOKIE_NAME, session_id, expires=expires_rfc822)
