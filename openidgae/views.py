@@ -66,8 +66,7 @@ def get_session_id_from_cookie(request):
 def write_session_id_cookie(response, session_id):
   expires = datetime.datetime.now() + datetime.timedelta(weeks=2)
   expires_rfc822 = expires.strftime('%a, %d %b %Y %H:%M:%S +0000')
-  response.set_cookie('session_id', str(session_id),
-      expires=expires_rfc822)
+  response.set_cookie('session_id', session_id, expires=expires_rfc822)
 
 def get_session(request, response, create=True):
   if hasattr(request, 'openidgae_session'):
@@ -77,16 +76,16 @@ def get_session(request, response, create=True):
   session_id = get_session_id_from_cookie(request)
   if session_id:
     import models
-    sessions = models.Session.gql("WHERE session_id = :1", session_id)
-    if sessions.count() == 1:
-      request.openidgae_session = sessions[0]
+    session = models.Session.get_by_key_name(session_id)
+    if session is not None:
+      request.openidgae_session = session
       return request.openidgae_session
 
   if create:
     import models
     request.openidgae_session = models.Session()
     request.openidgae_session.put()
-    write_session_id_cookie(response, request.openidgae_session.session_id)
+    write_session_id_cookie(response, request.openidgae_session.key().name())
     return request.openidgae_session
 
   return None

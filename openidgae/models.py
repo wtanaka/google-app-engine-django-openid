@@ -54,9 +54,6 @@ class Session(db.Expando):
   # we store it here
   url = db.StringProperty()
 
-  # this goes in the cookie
-  session_id = db.StringProperty()
-
   def __init__(self, parent=None, key_name=None, **kw):
     """if key_name is None, generate a random key_name so that
        session_id cookies are not guessable
@@ -69,19 +66,3 @@ class Session(db.Expando):
       import base64
       key_name = "S" + base64.urlsafe_b64encode(key_name).rstrip('=')
     super(db.Expando, self).__init__(parent=parent, key_name=key_name, **kw)
-
-  def put(self):
-    if self.session_id is None:
-
-      if self.is_saved():
-        key = self.key() 
-      else:
-        key = db.Expando.put(self)
-
-      self.session_id = hashlib.sha1(str(key)).hexdigest()
-    else:
-      key = self.key()
-
-    assert self.session_id
-    db.Expando.put(self)
-    return key
