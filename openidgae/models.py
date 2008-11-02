@@ -19,7 +19,6 @@ class Nonce(db.Model):
 class Person(db.Model):
   openid = db.StringProperty()
   date = db.DateTimeProperty(auto_now_add=True)
-  hashedkey = db.StringProperty()
 
   def openidURI(self):
     from openid.yadis import xri
@@ -29,19 +28,6 @@ class Person(db.Model):
 
   def pretty_openid(self):
     return self.openid.replace('http://','').replace('https://','').rstrip('/').split('#')[0]
-
-  def put(self):
-    if self.hashedkey is None:
-      if self.is_saved():
-        key = self.key()
-      else:
-        key = db.Model.put(self)
-
-      self.hashedkey = hashlib.sha1(str(key)).hexdigest()
-
-    assert self.hashedkey
-    return db.Model.put(self)
-
 
 class Session(db.Expando):
   # the logged in person
