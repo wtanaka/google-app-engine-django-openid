@@ -1,24 +1,13 @@
 # vim:ts=2:sw=2:expandtab
-import cgi
-import wsgiref.handlers
-import urllib
 import os
 import logging
 import datetime
-import Cookie
-import pprint
-
-from google.appengine.api import users
-from google.appengine.ext import webapp
-from google.appengine.ext import db
 
 import django.core.urlresolvers
 import django.http
 
-from openid import fetchers
 from openid.consumer.consumer import Consumer
 from openid.consumer import discover
-from fetcher import UrlfetchFetcher
 import store
 
 def installFetcher():
