@@ -18,8 +18,6 @@ def installFetcher():
 DIRNAME = os.path.dirname(__file__)
 def render(template_name, request, response, extra_values={}):
   values = {
-    'request': request,
-    'debug': request.GET.get('deb', ''),
     'lip': get_logged_in_person(request, response)
     }
 
