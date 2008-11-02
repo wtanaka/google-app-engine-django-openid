@@ -1,6 +1,7 @@
 import django.http
+import openidgae
 
 def exampleMain(request):
    response = django.http.HttpResponse()
-   response.write('<a href="/openid-login/">Login</a>')
+   response.write('<a href="%s">Login</a>' % openidgae.create_login_url())
    return response

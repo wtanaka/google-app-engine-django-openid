@@ -61,7 +61,7 @@ def MainPage(request, error_msg):
       }
 
     response['X-XRDS-Location'] = 'http://'+request.META['HTTP_HOST']+'/rpxrds/'
-    response.write(render('main.html', request, response, template_values))
+    response.write(render('openidgae-main.html', request, response, template_values))
     return response
 
 
@@ -81,7 +81,7 @@ def PersonPage(request):
 
     lip = openidgae.get_current_person(request, response)
 
-    response.write(render('person.html',request,response,
+    response.write(render('openidgae-person.html',request,response,
           {'person':p,
           'lip_is_person': lip and lip.openid == p.openid }))
     return response
@@ -91,7 +91,7 @@ def HomePage(request):
   response = django.http.HttpResponse()
   if request.method == 'GET':
     if openidgae.get_current_person(request, response):
-      response.write(render('home.html',request,response,{}))
+      response.write(render('openidgae-home.html',request,response,{}))
       return response
     else:
       return django.http.HttpResponseRedirect('/')
@@ -100,7 +100,7 @@ def LoginPage(request):
   installFetcher()
   response = django.http.HttpResponse()
   if request.method == 'GET':
-    response.write(render('login.html',request,response,{}))
+    response.write(render('openidgae-login.html',request,response,{}))
     return response
 
 def OpenIDStartSubmit(request):

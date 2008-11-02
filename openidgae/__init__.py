@@ -37,6 +37,14 @@ def get_session(request, response, create=True):
 
   return None
 
+def create_login_url():
+  import django.core.urlresolvers
+  return django.core.urlresolvers.reverse('openidgae.views.LoginPage')
+
+def create_logout_url():
+  import django.core.urlresolvers
+  return django.core.urlresolvers.reverse('openidgae.views.LogoutSubmit')
+
 def get_current_person(request, response):
   if hasattr(request, 'openidgae_logged_in_person'):
     return request.openidgae_logged_in_person
