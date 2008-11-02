@@ -37,7 +37,7 @@ def get_session(request, response, create=True):
 
   return None
 
-def get_logged_in_person(request, response):
+def get_current_person(request, response):
   if hasattr(request, 'openidgae_logged_in_person'):
     return request.openidgae_logged_in_person
 

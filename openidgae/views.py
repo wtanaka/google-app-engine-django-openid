@@ -19,7 +19,7 @@ def installFetcher():
 DIRNAME = os.path.dirname(__file__)
 def render(template_name, request, response, extra_values={}):
   values = {
-    'lip': openidgae.get_logged_in_person(request, response)
+    'lip': openidgae.get_current_person(request, response)
     }
 
   values.update(extra_values)
@@ -79,7 +79,7 @@ def PersonPage(request):
       return show_main_page(request, 'Unknown user')
 
 
-    lip = openidgae.get_logged_in_person(request, response)
+    lip = openidgae.get_current_person(request, response)
 
     response.write(render('person.html',request,response,
           {'person':p,
@@ -90,7 +90,7 @@ def HomePage(request):
   installFetcher()
   response = django.http.HttpResponse()
   if request.method == 'GET':
-    if openidgae.get_logged_in_person(request, response):
+    if openidgae.get_current_person(request, response):
       response.write(render('home.html',request,response,{}))
       return response
     else:
