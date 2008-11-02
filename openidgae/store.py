@@ -1,6 +1,5 @@
 #!/usr/bin/python
 
-import datetime
 import time
 
 from openid.association import Association as xAssociation

@@ -1,6 +1,5 @@
 from openid import fetchers
 from google.appengine.api import urlfetch
-import logging
 
 class UrlfetchFetcher(fetchers.HTTPFetcher):
   """An HTTPFetcher subclass that uses Google App Engine's urlfetch module.
