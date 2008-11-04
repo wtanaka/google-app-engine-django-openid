@@ -39,13 +39,23 @@ def get_session(request, response, create=True):
 
   return None
 
-def create_login_url():
+def create_login_url(dest_url):
   import django.core.urlresolvers
-  return django.core.urlresolvers.reverse('openidgae.views.LoginPage')
+  baseLoginPath = django.core.urlresolvers.reverse('openidgae.views.LoginPage')
+  import urllib
+  return '%s?continue=%s' % (
+      baseLoginPath,
+      urllib.quote_plus(dest_url)
+      )
 
-def create_logout_url():
+def create_logout_url(dest_url):
   import django.core.urlresolvers
-  return django.core.urlresolvers.reverse('openidgae.views.LogoutSubmit')
+  baseLogoutPath = django.core.urlresolvers.reverse('openidgae.views.LogoutSubmit')
+  import urllib
+  return '%s?continue=%s' % (
+      baseLogoutPath,
+      urllib.quote_plus(dest_url)
+      )
 
 def get_current_person(request, response):
   if hasattr(request, 'openidgae_logged_in_person'):

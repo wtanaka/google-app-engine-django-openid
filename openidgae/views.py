@@ -107,7 +107,15 @@ def LoginPage(request):
   initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
-    response.write(render('openidgae-login.html',request,response,{}))
+    continueUrl = request.GET.get('continue', '/')
+    # Sanitize
+    if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
+      continueUrl = '/'
+    import urllib
+    template_values = {
+      'continueUrl': urllib.quote_plus(continueUrl),
+    }
+    response.write(render('openidgae-login.html',request,response,template_values))
     return response
 
 def OpenIDStartSubmit(request):
@@ -130,7 +138,13 @@ def OpenIDStartSubmit(request):
     parts = list(urlparse.urlparse(get_full_path(request)))
     # finish URL with the leading "/" character removed
     parts[2] = django.core.urlresolvers.reverse('openidgae.views.OpenIDFinish')[1:]
-    parts[4] = ''
+
+    continueUrl = request.GET.get('continue', '/')
+    # Sanitize
+    if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
+      continueUrl = '/'
+    import urllib
+    parts[4] = 'continue=%s' % urllib.quote_plus(continueUrl)
     parts[5] = ''
     return_to = urlparse.urlunparse(parts)
 
@@ -195,7 +209,12 @@ def OpenIDFinish(request):
 
       s.put()
 
-      return django.http.HttpResponseRedirect(django.core.urlresolvers.reverse('openidgae.views.HomePage'))
+      continueUrl = request.GET.get('continue', '/')
+      # Sanitize
+      if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
+        continueUrl = '/'
+
+      return django.http.HttpResponseRedirect(continueUrl)
 
     else:
       return show_main_page(request, 'OpenID verification failed :(')
@@ -209,7 +228,12 @@ def LogoutSubmit(request):
       s.person = None
       s.put()
 
-    return django.http.HttpResponseRedirect('/')
+    continueUrl = request.GET.get('continue', '/')
+    # Sanitize
+    if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
+      continueUrl = '/'
+
+    return django.http.HttpResponseRedirect(continueUrl)
 
 def RelyingPartyXRDS(request):
   initOpenId()
