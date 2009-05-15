@@ -36,10 +36,6 @@ class Session(db.Expando):
   # OpenID library session stuff
   openid_stuff = db.TextProperty()
 
-  # when someone tries to demand a site and they aren't logged in,
-  # we store it here
-  url = db.StringProperty()
-
   def __init__(self, parent=None, key_name=None, **kw):
     """if key_name is None, generate a random key_name so that
        session_id cookies are not guessable

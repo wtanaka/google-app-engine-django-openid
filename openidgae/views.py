@@ -200,13 +200,6 @@ def OpenIDFinish(request):
       s.person = p.key()
       request.openidgae_logged_in_person = p
 
-      if s.url:
-        add = AddWebsiteSubmit()
-        add.request = self.request
-        add.response = self.response
-        add.vote_for(s.url, p)
-        s.url = None
-
       s.put()
 
       continueUrl = request.GET.get('continue', '/')
