@@ -70,8 +70,17 @@ def get_current_person(request, response):
     return request.openidgae_logged_in_person
 
   s = get_session(request, response, create=False)
-  if s and s.person:
-    request.openidgae_logged_in_person = s.person
-    return request.openidgae_logged_in_person
+  if not s:
+    return None
 
-  return None
+  # Workaround for Google App Engine Bug 426
+  from google.appengine.api import datastore_errors
+  try:
+    request.openidgae_logged_in_person = s.person
+  except datastore_errors.Error, e:
+    if e.args[0] == "ReferenceProperty failed to be resolved":
+      return None
+    else:
+      raise
+
+  return request.openidgae_logged_in_person
