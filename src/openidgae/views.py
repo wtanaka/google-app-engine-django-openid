@@ -60,7 +60,8 @@ def show_main_page(request, error_msg=None):
 
 
 ############## Handlers #################
-def MainPage(request, error_msg):
+def MainPage(request, error_msg,
+             template_name='openidgae-main.html'):
   initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
@@ -69,11 +70,11 @@ def MainPage(request, error_msg):
       }
 
     response['X-XRDS-Location'] = 'http://'+request.META['HTTP_HOST']+'/rpxrds/'
-    response.write(render('openidgae-main.html', request, response, template_values))
+    response.write(render(template_name, request, response, template_values))
     return response
 
 
-def PersonPage(request):
+def PersonPage(request, template_name='openidgae-person.html'):
   initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
@@ -89,22 +90,22 @@ def PersonPage(request):
 
     lip = openidgae.get_current_person(request, response)
 
-    response.write(render('openidgae-person.html',request,response,
+    response.write(render(template_name, request,response,
           {'person':p,
           'lip_is_person': lip and lip.openid == p.openid }))
     return response
 
-def HomePage(request):
+def HomePage(request, template_name='openidgae-home.html'):
   initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
     if openidgae.get_current_person(request, response):
-      response.write(render('openidgae-home.html',request,response,{}))
+      response.write(render(template_name, request,response,{}))
       return response
     else:
       return django.http.HttpResponseRedirect('/')
 
-def LoginPage(request):
+def LoginPage(request, template_name='openidgae-login.html'):
   initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
@@ -116,7 +117,7 @@ def LoginPage(request):
     template_values = {
       'continueUrl': urllib.quote_plus(continueUrl),
     }
-    response.write(render('openidgae-login.html',request,response,template_values))
+    response.write(render(template_name,request,response,template_values))
     return response
 
 def OpenIDStartSubmit(request):
