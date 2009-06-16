@@ -186,12 +186,12 @@ def OpenIDFinish(request):
     auth_response = c.complete(args, url)
 
     if auth_response.status == 'success':
-      openid = auth_response.getDisplayIdentifier()
+      openid_url = auth_response.getDisplayIdentifier()
       import models
-      persons = models.Person.gql('WHERE openid = :1', openid)
+      persons = models.Person.gql('WHERE openid = :1', openid_url)
       if persons.count() == 0:
         p = models.Person()
-        p.openid = openid
+        p.openid = openid_url
         p.put()
       else:
         p = persons[0]
