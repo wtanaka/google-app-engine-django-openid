@@ -19,6 +19,23 @@ class Nonce(db.Model):
 class Person(db.Model):
   openid = db.StringProperty()
   date = db.DateTimeProperty(auto_now_add=True)
+  # Pickled Simple Registration Response
+  sreg = db.BlobProperty()
+  # Pickled Attribute Exchange Response
+  ax = db.BlobProperty()
+
+  def get_depickled_version(self, property):
+    if not property:
+      return {}
+    else:
+      import pickle
+      return pickle.loads(property)
+
+  def get_sreg_dict(self):
+    return self.get_depickled_version(self.sreg)
+
+  def get_ax_dict(self):
+    return self.get_depickled_version(self.ax)
 
   def openidURI(self):
     from openid.yadis import xri

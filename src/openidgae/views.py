@@ -8,8 +8,9 @@ import django.http
 
 from openid.consumer.consumer import Consumer
 from openid.consumer import discover
-import store
+import openid.consumer.consumer
 import openidgae
+import store
 
 def initOpenId():
   # installFetcher
@@ -134,6 +135,26 @@ def OpenIDStartSubmit(request):
           % (openid, str(e)))
       return show_main_page(request, 'An error occured determining your server information.  Please try again.')
 
+    from openid.extensions import sreg
+    sreg_request = sreg.SRegRequest(
+        optional=['dob', 'gender', 'postcode'],
+        required=['email', 'nickname', 'fullname', 'country', 'language', 'timezone'])
+    auth_request.addExtension(sreg_request)
+
+    from openid.extensions import ax
+    ax_req = ax.FetchRequest()
+    ax_req.add(ax.AttrInfo('http://schema.openid.net/contact/email',
+          alias='email',required=True))
+    ax_req.add(ax.AttrInfo('http://axschema.org/namePerson/first',
+          alias='firstname',required=True))
+    ax_req.add(ax.AttrInfo('http://axschema.org/namePerson/last',
+          alias='lastname',required=True))
+    ax_req.add(ax.AttrInfo('http://axschema.org/pref/language',
+          alias='language',required=True))
+    ax_req.add(ax.AttrInfo('http://axschema.org/contact/country/home',
+          alias='country',required=True))
+    auth_request.addExtension(ax_req)
+
     import urlparse
     parts = list(urlparse.urlparse(get_full_path(request)))
     # finish URL with the leading "/" character removed
@@ -185,16 +206,50 @@ def OpenIDFinish(request):
     c = Consumer(s, get_store())
     auth_response = c.complete(args, url)
 
-    if auth_response.status == 'success':
+    sreg_response = {}
+    ax_items = {}
+    if auth_response.status == openid.consumer.consumer.SUCCESS:
+      from openid.extensions import sreg
+      sreg_response = sreg.SRegResponse.fromSuccessResponse(auth_response)
+      sreg_response = dict(sreg_response.iteritems())
+      logging.debug("sreg_response: %r" % sreg_response)
+
+      from openid.extensions import ax
+      ax_response = ax.FetchResponse.fromSuccessResponse(auth_response)
+      logging.debug("ax_response: %r" % ax_response)
+      if ax_response:
+        ax_items = {
+          'email': ax_response.get(
+              'http://schema.openid.net/contact/email'),
+          'firstname': ax_response.get(
+              'http://axschema.org/namePerson/first'),
+          'lastname': ax_response.get(
+              'http://axschema.org/namePerson/last'),
+          'language': ax_response.get(
+              'http://axschema.org/pref/language'),
+          'country': ax_response.get(
+              'http://axschema.org/contact/country/home'),
+        }
+        logging.debug("ax_items: %r" % ax_items)
+
       openid_url = auth_response.getDisplayIdentifier()
+
       import models
       persons = models.Person.gql('WHERE openid = :1', openid_url)
       if persons.count() == 0:
         p = models.Person()
         p.openid = openid_url
+        import pickle
+        p.ax = pickle.dumps(ax_items, pickle.HIGHEST_PROTOCOL)
+        p.sreg = pickle.dumps(sreg_response, pickle.HIGHEST_PROTOCOL)
         p.put()
       else:
         p = persons[0]
+        if p.get_sreg_dict() != sreg_response or \
+            p.get_ax_dict() != ax_items:
+          p.ax = pickle.dumps(ax_items, pickle.HIGHEST_PROTOCOL)
+          p.sreg = pickle.dumps(sreg_response, pickle.HIGHEST_PROTOCOL)
+          p.put()
 
       s = openidgae.get_session(request, response)
       s.person = p.key()
