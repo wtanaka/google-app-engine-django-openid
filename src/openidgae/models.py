@@ -46,6 +46,23 @@ class Person(db.Model):
   def pretty_openid(self):
     return self.openid.replace('http://','').replace('https://','').rstrip('/').split('#')[0]
 
+  def person_name(self):
+    ax_dict = self.get_ax_dict()
+    sreg_dict = self.get_sreg_dict()
+    if ax_dict.get('firstname', False) and \
+        ax_dict.get('lastname', False):
+      firstname = ax_dict['firstname']
+      if isinstance(firstname, list):
+        firstname = firstname[0]
+      lastname = ax_dict['lastname']
+      if isinstance(lastname, list):
+        lastname = lastname[0]
+      return "%s %s" % (firstname, lastname)
+    elif sreg_dict.get('fullname', False):
+      return sreg_dict['fullname']
+    else:
+      return self.pretty_openid()
+
 class Session(db.Expando):
   # the logged in person
   person = db.ReferenceProperty(Person)
