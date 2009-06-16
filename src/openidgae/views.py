@@ -130,8 +130,8 @@ def OpenIDStartSubmit(request):
     try:
       auth_request = c.begin(openid)
     except discover.DiscoveryFailure, e:
-      logging.error('Error with begin on '+openid)
-      logging.error(str(e))
+      logging.error('OpenID discovery error with begin on %s: %s'
+          % (openid, str(e)))
       return show_main_page(request, 'An error occured determining your server information.  Please try again.')
 
     import urlparse
