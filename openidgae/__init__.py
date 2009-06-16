@@ -41,7 +41,11 @@ def get_session(request, response, create=True):
 
 def create_login_url(dest_url):
   import django.core.urlresolvers
-  baseLoginPath = django.core.urlresolvers.reverse('openidgae.views.LoginPage')
+  baseLoginPath = '/'
+  try:
+    baseLoginPath = django.core.urlresolvers.reverse('openidgae.views.LoginPage')
+  except:
+    pass
   import urllib
   return '%s?continue=%s' % (
       baseLoginPath,
@@ -50,7 +54,11 @@ def create_login_url(dest_url):
 
 def create_logout_url(dest_url):
   import django.core.urlresolvers
-  baseLogoutPath = django.core.urlresolvers.reverse('openidgae.views.LogoutSubmit')
+  baseLogoutPath = '/'
+  try:
+    baseLogoutPath = django.core.urlresolvers.reverse('openidgae.views.LogoutSubmit')
+  except:
+    pass
   import urllib
   return '%s?continue=%s' % (
       baseLogoutPath,
