@@ -95,7 +95,8 @@ def PersonPage(request, template_name='openidgae-person.html'):
           'lip_is_person': lip and lip.openid == p.openid }))
     return response
 
-def HomePage(request, template_name='openidgae-home.html'):
+def HomePage(request, template_name='openidgae-home.html',
+             success_url='/'):
   initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
@@ -103,16 +104,17 @@ def HomePage(request, template_name='openidgae-home.html'):
       response.write(render(template_name, request,response,{}))
       return response
     else:
-      return django.http.HttpResponseRedirect('/')
+      return django.http.HttpResponseRedirect(success_url)
 
-def LoginPage(request, template_name='openidgae-login.html'):
+def LoginPage(request, template_name='openidgae-login.html',
+              default_success_url='/'):
   initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
-    continueUrl = request.GET.get('continue', '/')
+    continueUrl = request.GET.get('continue', default_success_url)
     # Sanitize
     if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
-      continueUrl = '/'
+      continueUrl = default_success_url
     import urllib
     template_values = {
       'continueUrl': urllib.quote_plus(continueUrl),
@@ -120,7 +122,7 @@ def LoginPage(request, template_name='openidgae-login.html'):
     response.write(render(template_name,request,response,template_values))
     return response
 
-def OpenIDStartSubmit(request):
+def OpenIDStartSubmit(request, default_success_url='/'):
   initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'POST':
@@ -161,10 +163,10 @@ def OpenIDStartSubmit(request):
     # finish URL with the leading "/" character removed
     parts[2] = django.core.urlresolvers.reverse('openidgae.views.OpenIDFinish')[1:]
 
-    continueUrl = request.GET.get('continue', '/')
+    continueUrl = request.GET.get('continue', default_success_url)
     # Sanitize
     if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
-      continueUrl = '/'
+      continueUrl = default_success_url
     import urllib
     parts[4] = 'continue=%s' % urllib.quote_plus(continueUrl)
     parts[5] = ''
@@ -187,7 +189,7 @@ def OpenIDStartSubmit(request):
     return response
 
 
-def OpenIDFinish(request):
+def OpenIDFinish(request, default_success_url='/'):
   initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
@@ -265,17 +267,17 @@ def OpenIDFinish(request):
 
       s.put()
 
-      continueUrl = request.GET.get('continue', '/')
+      continueUrl = request.GET.get('continue', default_success_url)
       # Sanitize
       if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
-        continueUrl = '/'
+        continueUrl = default_success_url
 
       return django.http.HttpResponseRedirect(continueUrl)
 
     else:
       return show_main_page(request, 'OpenID verification failed :(')
 
-def LogoutSubmit(request):
+def LogoutSubmit(request, default_success_url='/'):
   initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
@@ -284,10 +286,10 @@ def LogoutSubmit(request):
       s.person = None
       s.put()
 
-    continueUrl = request.GET.get('continue', '/')
+    continueUrl = request.GET.get('continue', default_success_url)
     # Sanitize
     if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
-      continueUrl = '/'
+      continueUrl = default_success_url
 
     return django.http.HttpResponseRedirect(continueUrl)
 
