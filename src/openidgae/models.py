@@ -17,25 +17,64 @@ class Nonce(db.Model):
   timestamp = db.IntegerProperty()
 
 class Person(db.Model):
+  """
+  # Make sure that ax_dict/sreg_dict return the dict by reference, and
+  # that changes get saved on put()
+  >>> import models
+  >>> p = models.Person()
+  >>> p.ax_dict()
+  {}
+  >>> p.ax_dict()['horsie'] = 'doggie'
+  >>> p.ax_dict()
+  {'horsie': 'doggie'}
+  >>> p.put() is not None
+  True
+  >>> import pickle
+  >>> pickle.loads(p.ax)
+  {'horsie': 'doggie'}
+
+  # Ensure that pickle.dumps is not getting called on put() if we
+  # haven't touched ax/sreg
+  >>> p = models.Person()
+  >>> hasattr(p, 'cache_ax')
+  False
+  >>> p.put() is not None
+  True
+  >>> hasattr(p, 'cache_ax')
+  False
+  """
   openid = db.StringProperty()
   date = db.DateTimeProperty(auto_now_add=True)
-  # Pickled Simple Registration Response
+  # Pickled Simple Registration Response - Do not set directly, use
+  # sreg_dict instead
   sreg = db.BlobProperty()
-  # Pickled Attribute Exchange Response
+  # Pickled Attribute Exchange Response - Do not set directly, use
+  # ax_dict instead
   ax = db.BlobProperty()
 
-  def get_depickled_version(self, property):
-    if not property:
-      return {}
-    else:
+  def put(self):
+    for name in ('sreg', 'ax'):
+      value = getattr(self, 'cache_%s' % name, {})
       import pickle
-      return pickle.loads(property)
+      setattr(self, name, pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
+    return super(Person, self).put()
 
-  def get_sreg_dict(self):
-    return self.get_depickled_version(self.sreg)
+  def get_depickled_version(self, propertyname):
+    cachepropertyname = 'cache_%s' % propertyname
+    if not hasattr(self, cachepropertyname):
+      value = {}
+      pickledvalue = getattr(self, propertyname, None)
+      if pickledvalue:
+        import pickle
+        value = pickle.loads(pickledvalue)
+      setattr(self, cachepropertyname, value)
+    return getattr(self, cachepropertyname)
 
-  def get_ax_dict(self):
-    return self.get_depickled_version(self.ax)
+  def sreg_dict(self):
+    return self.get_depickled_version('sreg')
+
+  def ax_dict(self):
+    return self.get_depickled_version('ax')
 
   def openidURI(self):
     from openid.yadis import xri
@@ -47,8 +86,8 @@ class Person(db.Model):
     return self.openid.replace('http://','').replace('https://','').rstrip('/').split('#')[0]
 
   def person_name(self):
-    ax_dict = self.get_ax_dict()
-    sreg_dict = self.get_sreg_dict()
+    ax_dict = self.ax_dict()
+    sreg_dict = self.sreg_dict()
     if ax_dict.get('firstname', False) and \
         ax_dict.get('lastname', False):
       firstname = ax_dict['firstname']

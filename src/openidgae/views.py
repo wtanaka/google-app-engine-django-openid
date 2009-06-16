@@ -239,16 +239,23 @@ def OpenIDFinish(request):
       if persons.count() == 0:
         p = models.Person()
         p.openid = openid_url
-        import pickle
-        p.ax = pickle.dumps(ax_items, pickle.HIGHEST_PROTOCOL)
-        p.sreg = pickle.dumps(sreg_response, pickle.HIGHEST_PROTOCOL)
+        p.ax_dict().update(ax_items)
+        p.sreg_dict().update(sreg_response)
         p.put()
       else:
         p = persons[0]
-        if p.get_sreg_dict() != sreg_response or \
-            p.get_ax_dict() != ax_items:
-          p.ax = pickle.dumps(ax_items, pickle.HIGHEST_PROTOCOL)
-          p.sreg = pickle.dumps(sreg_response, pickle.HIGHEST_PROTOCOL)
+        changed = False
+        for key in sreg_response:
+          if not p.sreg_dict().has_key(key):
+            logging.debug("Setting sreg %s" % key)
+            changed = True
+            p.sreg_dict()[key] = sreg_response[key]
+        for key in ax_items:
+          if not p.ax_dict().has_key(key):
+            logging.info("key %s" % key)
+            changed = True
+            p.ax_dict()[key] = ax_items[key]
+        if changed:
           p.put()
 
       s = openidgae.get_session(request, response)
