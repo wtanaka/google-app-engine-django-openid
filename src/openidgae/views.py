@@ -12,18 +12,6 @@ import openid.consumer.consumer
 import openidgae
 import store
 
-def initOpenId():
-  # installFetcher
-  from openid import fetchers
-  import openidgae.fetcher
-  fetchers.setDefaultFetcher(openidgae.fetcher.UrlfetchFetcher())
-  # Switch logger to use logging package instead of stderr
-  from openid import oidutil
-  def myLoggingFunction(message, level=0):
-    import logging
-    logging.info(message)
-  oidutil.log = myLoggingFunction
-
 DIRNAME = os.path.dirname(__file__)
 def render(template_name, request, response, extra_values={}):
   values = {
@@ -62,7 +50,6 @@ def show_main_page(request, error_msg=None):
 ############## Handlers #################
 def MainPage(request, error_msg,
              template_name='openidgae-main.html'):
-  initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
     template_values = {
@@ -75,7 +62,6 @@ def MainPage(request, error_msg,
 
 
 def PersonPage(request, template_name='openidgae-person.html'):
-  initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
     openid = request.GET.get('openid', '')
@@ -97,7 +83,6 @@ def PersonPage(request, template_name='openidgae-person.html'):
 
 def HomePage(request, template_name='openidgae-home.html',
              success_url='/'):
-  initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
     if openidgae.get_current_person(request, response):
@@ -108,7 +93,6 @@ def HomePage(request, template_name='openidgae-home.html',
 
 def LoginPage(request, template_name='openidgae-login.html',
               default_success_url='/'):
-  initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
     continueUrl = request.GET.get('continue', default_success_url)
@@ -123,7 +107,6 @@ def LoginPage(request, template_name='openidgae-login.html',
     return response
 
 def OpenIDStartSubmit(request, default_success_url='/'):
-  initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'POST':
     openid = request.POST.get('openid_identifier', '')
@@ -190,7 +173,6 @@ def OpenIDStartSubmit(request, default_success_url='/'):
 
 
 def OpenIDFinish(request, default_success_url='/'):
-  initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
     args = args_to_dict(request.GET)
@@ -278,7 +260,6 @@ def OpenIDFinish(request, default_success_url='/'):
       return show_main_page(request, 'OpenID verification failed :(')
 
 def LogoutSubmit(request, default_success_url='/'):
-  initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
     s = openidgae.get_session(request, response)
@@ -294,7 +275,6 @@ def LogoutSubmit(request, default_success_url='/'):
     return django.http.HttpResponseRedirect(continueUrl)
 
 def RelyingPartyXRDS(request):
-  initOpenId()
   response = django.http.HttpResponse()
   if request.method == 'GET':
     xrds = """
