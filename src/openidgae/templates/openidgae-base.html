@@ -4,12 +4,6 @@
   </head>
 
   <body>
-    {% if error_msg %}
-    <div id="error">
-      {{ error_msg }}
-    </div>
-    {% endif %}
-
     <div id="header">
 	 {% if lip %}
 	 <a href="{% url openidgae.views.LogoutSubmit %}">logout</a>
