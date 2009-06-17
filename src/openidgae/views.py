@@ -201,15 +201,17 @@ def OpenIDFinish(request, default_success_url='/'):
         p = persons[0]
         changed = False
         for key in sreg_response:
-          if not p.sreg_dict().has_key(key):
+          if not p.sreg_dict().has_key(key) or \
+              p.sreg_dict()[key] != sreg_response[key]:
             logging.debug("Setting sreg %s" % key)
-            changed = True
             p.sreg_dict()[key] = sreg_response[key]
-        for key in ax_items:
-          if not p.ax_dict().has_key(key):
-            logging.info("key %s" % key)
             changed = True
+        for key in ax_items:
+          if not p.ax_dict().has_key(key) or \
+              p.ax_dict()[key] != ax_items[key]:
+            logging.info("Setting ax %s" % key)
             p.ax_dict()[key] = ax_items[key]
+            changed = True
         if changed:
           p.put()
 
