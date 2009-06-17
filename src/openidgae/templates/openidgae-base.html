@@ -6,6 +6,7 @@
   <body>
     <div id="header">
 	 {% if lip %}
+	 Welcome {{ lip.pretty_openid }}
 	 <a href="{% url openidgae.views.LogoutSubmit %}">logout</a>
 	 {% else %}
 	 <a href="{% url openidgae.views.LoginPage %}">login</a>
