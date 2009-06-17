@@ -245,9 +245,9 @@ def LogoutSubmit(request, default_success_url='/'):
 
 def RelyingPartyXRDS(request):
   response = django.http.HttpResponse()
+  url_finish = django.core.urlresolvers.reverse('openidgae.views.OpenIDFinish')
   if request.method == 'GET':
-    xrds = """
-<?xml version='1.0' encoding='UTF-8'?>
+    xrds = """<?xml version='1.0' encoding='UTF-8'?>
 <xrds:XRDS
   xmlns:xrds='xri://$xrds'
   xmlns:openid='http://openid.net/xmlns/1.0'
@@ -259,8 +259,7 @@ def RelyingPartyXRDS(request):
     </Service>
 </XRD>
 </xrds:XRDS>      
-""" % (request.META['HTTP_HOST'],django.core.urlresolvers.reverse('openidgae.views.OpenIDFinish'),)
-    
+""" % (request.META['HTTP_HOST'], url_finish)
 
     response['Content-Type'] = 'application/xrds+xml'
     response.write(xrds)
