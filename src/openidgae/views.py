@@ -38,6 +38,13 @@ def get_store():
 def args_to_dict(querydict):
   return dict([(arg, values[0]) for arg, values in querydict.lists()])
 
+def get_continue_url(request, default_success_url):
+  continueUrl = request.GET.get('continue', default_success_url)
+  # Sanitize
+  if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
+    continueUrl = default_success_url
+  return continueUrl
+
 def show_main_page(request, error_msg=None):
   """Do an internal (non-302) redirect to the front page.
 
@@ -64,10 +71,7 @@ def LoginPage(request, template_name='openidgae-login.html',
               default_success_url='/'):
   response = django.http.HttpResponse()
   if request.method == 'GET':
-    continueUrl = request.GET.get('continue', default_success_url)
-    # Sanitize
-    if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
-      continueUrl = default_success_url
+    continueUrl = get_continue_url(request, default_success_url)
     import urllib
     template_values = {
       'continueUrl': urllib.quote_plus(continueUrl),
@@ -115,10 +119,7 @@ def OpenIDStartSubmit(request, default_success_url='/'):
     # finish URL with the leading "/" character removed
     parts[2] = django.core.urlresolvers.reverse('openidgae.views.OpenIDFinish')[1:]
 
-    continueUrl = request.GET.get('continue', default_success_url)
-    # Sanitize
-    if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
-      continueUrl = default_success_url
+    continueUrl = get_continue_url(request, default_success_url)
     import urllib
     parts[4] = 'continue=%s' % urllib.quote_plus(continueUrl)
     parts[5] = ''
@@ -218,10 +219,7 @@ def OpenIDFinish(request, default_success_url='/'):
 
       s.put()
 
-      continueUrl = request.GET.get('continue', default_success_url)
-      # Sanitize
-      if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
-        continueUrl = default_success_url
+      continueUrl = get_continue_url(request, default_success_url)
 
       return django.http.HttpResponseRedirect(continueUrl)
 
@@ -236,10 +234,7 @@ def LogoutSubmit(request, default_success_url='/'):
       s.person = None
       s.put()
 
-    continueUrl = request.GET.get('continue', default_success_url)
-    # Sanitize
-    if continueUrl.find('//') >= 0 or not continueUrl.startswith('/'):
-      continueUrl = default_success_url
+    continueUrl = get_continue_url(request, default_success_url)
 
     return django.http.HttpResponseRedirect(continueUrl)
 
