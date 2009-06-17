@@ -4,9 +4,6 @@
   </head>
 
   <body>
-
-    <div id="wrap">
-
     {% if error_msg %}
     <div id="error">
       {{ error_msg }}
@@ -14,27 +11,17 @@
     {% endif %}
 
     <div id="header">
-      <div id="lip" style="font-size:smaller;">
-	{% if lip %}
-	<a href="{% url openidgae.views.HomePage %}">home</a>
-	<a href="{% url openidgae.views.PersonPage %}?openid={{lip.openid|urlencode}}">profile</a>
-	<a href="{% url openidgae.views.LogoutSubmit %}">logout</a>
-	
-	{% else %}
-	<a href="{% url openidgae.views.LoginPage %}">login</a>
-	{% endif %}
-      </div>
-
-
-      <div style="clear:both;"></div>
+	 {% if lip %}
+	 <a href="{% url openidgae.views.HomePage %}">home</a>
+	 <a href="{% url openidgae.views.PersonPage %}?openid={{lip.openid|urlencode}}">profile</a>
+	 <a href="{% url openidgae.views.LogoutSubmit %}">logout</a>
+	 {% else %}
+	 <a href="{% url openidgae.views.LoginPage %}">login</a>
+	 {% endif %}
     </div>
 
     <div id="content">
       {% block content %}{% endblock %}
     </div>
-
-    </div>
-
   </body>
-
 </html>

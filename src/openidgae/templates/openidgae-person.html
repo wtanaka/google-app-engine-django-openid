@@ -1,13 +1,7 @@
 {% extends 'openidgae-base.html' %}
 
-{% block title %}{{person.pretty_openid|escape}}'s Example Page{% endblock %}
+{% block title %}{{person.pretty_openid|escape}}'s Page{% endblock %}
 
 {% block content %}
-
-<span class="" style="float:right">
-Visit <a href="{{person.openidURI|escape}}" rel="nofollow">{{person.pretty_openid|escape}}</a>
-</span>
-
-<span class="title">{{ person.pretty_openid|escape }}</span>
-
+<p><a rel="nofollow" href="{{person.openidURI|escape}}">{{ person.pretty_openid|escape }}</a></p>
 {% endblock %}

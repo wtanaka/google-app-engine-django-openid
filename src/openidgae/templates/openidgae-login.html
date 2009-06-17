@@ -1,15 +1,13 @@
 {% extends 'openidgae-base.html' %}
 
-{% block title %}Please verify your OpenID{% endblock %}
+{% block title %}Log In{% endblock %}
 
 {% block content %}
 <h2>Login</h2>
 
-<form action="{% url openidgae.views.OpenIDStartSubmit %}" method="post">
-
+<form action="{% url openidgae.views.OpenIDStartSubmit %}?continue={{continueUrl}}" method="post">
 <input type="text" name="openid_identifier" id="openid_identifier" />
 <input type="submit" value="Verify" />
-
 </form>
 
 <!-- BEGIN ID SELECTOR --> 

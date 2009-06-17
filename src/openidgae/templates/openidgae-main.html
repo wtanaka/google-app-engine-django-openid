@@ -1,11 +1,9 @@
 {% extends 'openidgae-base.html' %}
 
-{% block title %}OpenID Consumer Example{% endblock %}
+{% block title %}OpenID{% endblock %}
 
 {% block content %}
-
 {% if not lip %}
- <a href="{% url openidgae.views.LoginPage %}" style="text-decoration:underline;" class="good">Login to get started &rarr;</a>
+ <a href="{% url openidgae.views.LoginPage %}">Login &rarr;</a>
 {% endif %}
-
 {% endblock %}
