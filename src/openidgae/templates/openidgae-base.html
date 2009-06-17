@@ -12,7 +12,6 @@
 
     <div id="header">
 	 {% if lip %}
-	 <a href="{% url openidgae.views.HomePage %}">home</a>
 	 <a href="{% url openidgae.views.LogoutSubmit %}">logout</a>
 	 {% else %}
 	 <a href="{% url openidgae.views.LoginPage %}">login</a>

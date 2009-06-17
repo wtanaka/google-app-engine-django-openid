@@ -60,16 +60,6 @@ def MainPage(request, error_msg,
     response.write(render(template_name, request, response, template_values))
     return response
 
-def HomePage(request, template_name='openidgae-home.html',
-             success_url='/'):
-  response = django.http.HttpResponse()
-  if request.method == 'GET':
-    if openidgae.get_current_person(request, response):
-      response.write(render(template_name, request,response,{}))
-      return response
-    else:
-      return django.http.HttpResponseRedirect(success_url)
-
 def LoginPage(request, template_name='openidgae-login.html',
               default_success_url='/'):
   response = django.http.HttpResponse()
