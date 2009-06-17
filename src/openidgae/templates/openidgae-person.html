@@ -1,7 +1,0 @@
-{% extends 'openidgae-base.html' %}
-
-{% block title %}{{person.pretty_openid|escape}}'s Page{% endblock %}
-
-{% block content %}
-<p><a rel="nofollow" href="{{person.openidURI|escape}}">{{ person.pretty_openid|escape }}</a></p>
-{% endblock %}

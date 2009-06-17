@@ -60,27 +60,6 @@ def MainPage(request, error_msg,
     response.write(render(template_name, request, response, template_values))
     return response
 
-
-def PersonPage(request, template_name='openidgae-person.html'):
-  response = django.http.HttpResponse()
-  if request.method == 'GET':
-    openid = request.GET.get('openid', '')
-
-    import models
-    persons = models.Person.gql("WHERE openid = :1",openid)
-    try:
-      p = persons[0]
-    except IndexError:
-      return show_main_page(request, 'Unknown user')
-
-
-    lip = openidgae.get_current_person(request, response)
-
-    response.write(render(template_name, request,response,
-          {'person':p,
-          'lip_is_person': lip and lip.openid == p.openid }))
-    return response
-
 def HomePage(request, template_name='openidgae-home.html',
              success_url='/'):
   response = django.http.HttpResponse()
