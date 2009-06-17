@@ -140,7 +140,10 @@ def OpenIDStartSubmit(request, default_success_url='/'):
         "<html><head><meta http-equiv=\"refresh\" content=\"0;url=%s\"></head><body></body></html>"
         % (redirect_url,))
     return response
-
+  else:
+    assert request.method != 'POST'
+    continueUrl = get_continue_url(request, default_success_url)
+    return django.http.HttpResponseRedirect(continueUrl)
 
 def OpenIDFinish(request, default_success_url='/'):
   response = django.http.HttpResponse()
