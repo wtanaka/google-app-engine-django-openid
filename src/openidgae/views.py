@@ -176,18 +176,18 @@ def OpenIDFinish(request, default_success_url='/'):
       ax_response = ax.FetchResponse.fromSuccessResponse(auth_response)
       logging.debug("ax_response: %r" % ax_response)
       if ax_response:
-        ax_items = {
-          'email': ax_response.get(
-              'http://schema.openid.net/contact/email'),
-          'firstname': ax_response.get(
-              'http://axschema.org/namePerson/first'),
-          'lastname': ax_response.get(
-              'http://axschema.org/namePerson/last'),
-          'language': ax_response.get(
-              'http://axschema.org/pref/language'),
-          'country': ax_response.get(
-              'http://axschema.org/contact/country/home'),
-        }
+        SHORTNAMES = (
+          ('email', 'http://schema.openid.net/contact/email'),
+          ('firstname', 'http://axschema.org/namePerson/first'),
+          ('lastname', 'http://axschema.org/namePerson/last'),
+          ('language', 'http://axschema.org/pref/language'),
+          ('country', 'http://axschema.org/contact/country/home'),
+        )
+        for short, long in SHORTNAMES:
+          try:
+            ax_items[short] = ax_response.get(long)
+          except KeyError, e:
+            pass
         logging.debug("ax_items: %r" % ax_items)
 
       openid_url = auth_response.getDisplayIdentifier()
