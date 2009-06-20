@@ -76,6 +76,15 @@ class Person(db.Model):
   def ax_dict(self):
     return self.get_depickled_version('ax')
 
+  def get_email(self):
+    """Attemps to return the SReg or AX email address for this
+    Person"""
+    toreturn = self.sreg_dict().get('email', None)
+    toreturn = self.ax_dict().get('email', toreturn)
+    if isinstance(toreturn, list):
+      toreturn = toreturn[0]
+    return toreturn
+
   def openidURI(self):
     from openid.yadis import xri
     if xri.identifierScheme(self.openid) == "XRI":
