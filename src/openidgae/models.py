@@ -54,9 +54,10 @@ class Person(db.Model):
 
   def put(self):
     for name in ('sreg', 'ax'):
-      value = getattr(self, 'cache_%s' % name, {})
-      import pickle
-      setattr(self, name, pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
+      if hasattr(self, 'cache_%s' % name):
+        value = getattr(self, 'cache_%s' % name)
+        import pickle
+        setattr(self, name, pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
     return super(Person, self).put()
 
   def get_depickled_version(self, propertyname):
