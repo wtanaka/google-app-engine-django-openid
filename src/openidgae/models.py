@@ -16,7 +16,7 @@ class Nonce(db.Model):
   nonce = db.StringProperty()
   timestamp = db.IntegerProperty()
 
-class Person(db.Model):
+class Person(db.Expando):
   """
   # Make sure that ax_dict/sreg_dict return the dict by reference, and
   # that changes get saved on put()
@@ -54,14 +54,14 @@ class Person(db.Model):
 
   def put(self):
     for name in ('sreg', 'ax'):
-      if hasattr(self, 'cache_%s' % name):
-        value = getattr(self, 'cache_%s' % name)
+      if hasattr(self, '_cache_%s' % name):
+        value = getattr(self, '_cache_%s' % name)
         import pickle
         setattr(self, name, pickle.dumps(value, pickle.HIGHEST_PROTOCOL))
     return super(Person, self).put()
 
   def get_depickled_version(self, propertyname):
-    cachepropertyname = 'cache_%s' % propertyname
+    cachepropertyname = '_cache_%s' % propertyname
     if not hasattr(self, cachepropertyname):
       value = {}
       pickledvalue = getattr(self, propertyname, None)
