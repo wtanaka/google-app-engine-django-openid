@@ -83,6 +83,7 @@ def OpenIDStartSubmit(request, default_success_url='/'):
   response = django.http.HttpResponse()
   if request.method == 'POST':
     openid = request.POST.get('openid_identifier', '')
+    openid = openid.strip()
     if not openid:
       return show_main_page(request)
 
