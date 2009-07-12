@@ -148,8 +148,13 @@ def OpenIDStartSubmit(request, default_success_url='/'):
 
 def OpenIDFinish(request, default_success_url='/'):
   response = django.http.HttpResponse()
-  if request.method == 'GET':
+  if request.method not in ('GET', 'POST'):
+    return django.http.HttpResponseNotAllowed(['GET', 'POST'])
+  else:
     args = args_to_dict(request.GET)
+    assert type(args) is dict
+    if request.method == 'POST':
+      args.update(args_to_dict(request.POST))
     url = 'http://'+request.META['HTTP_HOST']+django.core.urlresolvers.reverse('openidgae.views.OpenIDFinish')
     session = openidgae.get_session(request, response)
     s = {}
