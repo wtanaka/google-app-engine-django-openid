@@ -83,7 +83,10 @@ class Person(db.Expando):
     toreturn = self.sreg_dict().get('email', None)
     toreturn = self.ax_dict().get('email', toreturn)
     if isinstance(toreturn, list):
-      toreturn = toreturn[0]
+      if len(toreturn) > 0:
+        toreturn = toreturn[0]
+      else:
+        toreturn = None
     return toreturn
 
   def openidURI(self):
