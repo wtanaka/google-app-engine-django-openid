@@ -96,7 +96,8 @@ class Person(db.Expando):
     return self.openid
 
   def pretty_openid(self):
-    return self.openid.replace('http://','').replace('https://','').rstrip('/').split('#')[0]
+    import openidgae
+    return openidgae.pretty_openid(self.openid)
 
   def person_name(self):
     ax_dict = self.ax_dict()

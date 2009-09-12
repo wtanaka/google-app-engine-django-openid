@@ -5,6 +5,9 @@ COOKIE_NAME='openidgae_sess'
 if hasattr(settings, 'OPENIDGAE_COOKIE_NAME'):
   COOKIE_NAME = settings.OPENIDGAE_COOKIE_NAME
 
+def pretty_openid(openid):
+  return openid.replace('http://','').replace('https://','').rstrip('/').split('#')[0]
+
 def get_session_id_from_cookie(request):
   if request.COOKIES.has_key(COOKIE_NAME):
     return request.COOKIES[COOKIE_NAME]
