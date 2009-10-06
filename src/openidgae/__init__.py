@@ -20,7 +20,7 @@ def write_session_id_cookie(response, session_id):
   expires_rfc822 = expires.strftime('%a, %d %b %Y %H:%M:%S +0000')
   response.set_cookie(COOKIE_NAME, session_id, expires=expires_rfc822)
 
-def get_session(request, response, create=True):
+def get_session(request, response, create=True, refresh=True):
   if hasattr(request, 'openidgae_session'):
     return request.openidgae_session
 
@@ -30,6 +30,8 @@ def get_session(request, response, create=True):
     import models
     session = models.Session.get_by_key_name(session_id)
     if session is not None:
+      if refresh:
+        write_session_id_cookie(response, session_id)
       request.openidgae_session = session
       return request.openidgae_session
 
