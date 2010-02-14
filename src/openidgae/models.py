@@ -123,15 +123,21 @@ class Session(db.Expando):
   # OpenID library session stuff
   openid_stuff = db.TextProperty()
 
+  def generate_key_name():
+    import uuid
+    key_name = uuid.uuid4()
+    import binascii
+    key_name = binascii.unhexlify(key_name.hex)
+    import base64
+    key_name = "S" + base64.urlsafe_b64encode(key_name).rstrip('=')
+    return key_name
+  generate_key_name=staticmethod(generate_key_name)
+
   def __init__(self, parent=None, key_name=None, **kw):
-    """if key_name is None, generate a random key_name so that
-       session_id cookies are not guessable
-    """
-    if key_name is None:
-      import uuid
-      key_name = uuid.uuid4()
-      import binascii
-      key_name = binascii.unhexlify(key_name.hex)
-      import base64
-      key_name = "S" + base64.urlsafe_b64encode(key_name).rstrip('=')
+    if key_name is None and \
+        (not kw.has_key('key') or kw['key'] is None):
+      # if neither key_name nor key is specified, generate a random
+      # key_name so that session_id cookies are not guessable
+      key_name = Session.generate_key_name()
+
     super(db.Expando, self).__init__(parent=parent, key_name=key_name, **kw)
