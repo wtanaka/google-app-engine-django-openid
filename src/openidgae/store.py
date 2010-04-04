@@ -45,13 +45,15 @@ class DatastoreStore(OpenIDStore):
       query.filter('handle', handle)
 
     results = query.fetch(1)
+    assoc = None
     if len(results) > 0:
       assoc = xAssociation.deserialize(results[0].association)
-      if assoc.getExpiresIn() > 0:
-        # hasn't expired yet
-        return assoc
+      if assoc.getExpiresIn() <= 0:
+        results[0].delete() #self.removeAssociation(server_url, handle)
+        assoc = None
+    
+    return assoc
 
-    return None
 
   def removeAssociation(self, server_url, handle):
     """
