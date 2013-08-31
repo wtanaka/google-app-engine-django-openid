@@ -1,4 +1,5 @@
 {% extends 'openidgae-base.html' %}
+{% load url from future %}
 
 {% block title %}OpenID{% endblock %}
 
@@ -13,6 +14,6 @@
 {% endif %}
 
 {% if not lip %}
- <a href="{% url openidgae.views.LoginPage %}">Login &rarr;</a>
+ <a href="{% url 'openidgae.views.LoginPage' %}">Login &rarr;</a>
 {% endif %}
 {% endblock %}

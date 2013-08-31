@@ -1,11 +1,12 @@
 {% extends 'openidgae-base.html' %}
+{% load url from future %}
 
 {% block title %}Log In{% endblock %}
 
 {% block content %}
 <h2>Login</h2>
 
-<form action="{% url openidgae.views.OpenIDStartSubmit %}?continue={{continueUrl}}" method="post">
+<form action="{% url 'openidgae.views.OpenIDStartSubmit' %}?continue={{continueUrl}}" method="post">
 <input type="text" name="openid_identifier" id="openid_identifier" />
 <input type="submit" value="Verify" />
 </form>

@@ -1,4 +1,4 @@
-<html>
+{% load url from future %}<html>
   <head>
     <title>{% block title %}{% endblock %}</title>
   </head>
@@ -7,9 +7,9 @@
     <div id="header">
 	 {% if lip %}
 	 Welcome {{ lip.pretty_openid }}
-	 <a href="{% url openidgae.views.LogoutSubmit %}">logout</a>
+	 <a href="{% url 'openidgae.views.LogoutSubmit' %}">logout</a>
 	 {% else %}
-	 <a href="{% url openidgae.views.LoginPage %}">login</a>
+	 <a href="{% url 'openidgae.views.LoginPage' %}">login</a>
 	 {% endif %}
     </div>
 
