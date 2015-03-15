@@ -20,8 +20,3 @@ To install with an existing Google App Engine project:
   2. Modify your urls.py using [this urls.py](http://code.google.com/p/google-app-engine-django-openid/source/browse/trunk/src/urls.py) as an example 
   3. add 'openidgae' to INSTALLED_APPS in settings.py 
   4. add 'openidgae.middleware.OpenIDMiddleware' to MIDDLEWARE_CLASSES in settings.py 
-
-To get a copy of the latest svn trunk without any polluting .svn directories, you should be able to do:
-
-`svn export http://google-app-engine-django-openid.googlecode.com/svn/trunk/google-app-engine-django-openid-export`
-
